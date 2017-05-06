@@ -23,6 +23,7 @@ module.exports = function(sequelize, DataTypes) {
         project.belongsToMany(models.users, {
           through : 'project_assignments'
         });
+        project.hasMany(models.tasks);
       }
     }
   });
