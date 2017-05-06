@@ -22,7 +22,10 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     classMethods: {
-
+      associate: function(models) {
+        Users.belongsToMany(models.projects, {
+          through : 'project_assignments'
+        });
       }
     }
   });
