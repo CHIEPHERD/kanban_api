@@ -2,35 +2,31 @@
 //sequelize model:create --name Users --attributes first_name:string,last_name:string
 
 module.exports = function(sequelize, DataTypes) {
-  var Users = sequelize.define('users', {
+  var Tasks = sequelize.define('tasks', {
     id: {
       type: DataTypes.BIGINT,
       primaryKey: true,
       autoIncrement: true
     },
-    firstname: {
+    title: {
       type: DataTypes.STRING,
       defaultValue: ''
     },
-    lastname: {
-      type: DataTypes.STRING,
-      defaultValue: ''
-    },
-    nickname: {
-      type: DataTypes.STRING,
+    description: {
+      type: DataTypes.TEXT,
       defaultValue: ''
     }
   }, {
     classMethods: {
       associate: function(models) {
-        Users.belongsToMany(models.projects, {
-          through : 'project_assignments'
+        Tasks.hasMany(Tasks, {
+          as: 'ancestor'
         });
-        Users.belongsToMany(models.tasks, {
+        Tasks.belongsToMany(models.projects, {
           through : 'users_tasks'
         });
       }
     }
   });
-  return Users;
-};
+  return Tasks;
+}
