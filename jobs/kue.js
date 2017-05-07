@@ -4,7 +4,7 @@ var amqp = require('amqplib/callback_api');
 var kue = require('kue')
 
 Kue.prototype.run = function () {
-
+  createQueueFor('project.created', jobs.project.create)
 }
 
 function createQueueFor(resource, job) {
