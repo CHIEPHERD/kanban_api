@@ -19,7 +19,7 @@ function InstallPostgre {
   npm install -g sequelize-cli --save
   #connection postgres pour créer vagrant
   sudo -u postgres psql -c "CREATE USER vagrant WITH PASSWORD 'root'"
-  sudo -u postgres psql -c "CREATE DATABASE cp_chiepherd"
+  sudo -u postgres psql -c "CREATE DATABASE cp_kanban"
 }
 
 function SequelizeMigrate {
