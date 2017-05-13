@@ -6,6 +6,7 @@ var kue = require('kue')
 Kue.prototype.run = function () {
   createQueueFor('project.created', jobs.project.create)
   createQueueFor('project.updated', jobs.project.update)
+  createQueueFor('user.updated', jobs.user.create)
 }
 
 function createQueueFor(resource, job) {
