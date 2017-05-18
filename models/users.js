@@ -8,6 +8,11 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       autoIncrement: true
     },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
     firstname: {
       type: DataTypes.STRING,
       defaultValue: ''
