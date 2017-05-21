@@ -8,6 +8,9 @@ Kue.prototype.run = function () {
   createQueueFor('project.updated', jobs.project.update)
   createQueueFor('user.created', jobs.user.create)
   createQueueFor('user.updated', jobs.user.update)
+  createQueueFor('task.created', jobs.task.create)
+  createQueueFor('task.updated', jobs.task.update)
+  createQueueFor('task.deleted', jobs.task.delete)
 }
 
 function createQueueFor(resource, job) {
