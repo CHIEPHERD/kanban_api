@@ -5,8 +5,14 @@ module.exports = function(sequelize, DataTypes) {
   var Tasks = sequelize.define('tasks', {
     id: {
       type: DataTypes.BIGINT,
+      unique: true,
       primaryKey: true,
       autoIncrement: true
+    },
+    uuid: {
+      type: DataTypes.STRING,
+      unique: true,
+      primaryKey: true
     },
     title: {
       type: DataTypes.STRING,
@@ -19,12 +25,14 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        Tasks.hasMany(Tasks, {
-          as: 'ancestor'
+        Tasks.belongsTo(models.tasks, {
+          as: 'ancestor',
+          onDelete: 'CASCADE'
         });
         Tasks.belongsToMany(models.projects, {
           through : 'users_tasks'
         });
+        Tasks.belongsTo(models.projects);
       }
     }
   });
