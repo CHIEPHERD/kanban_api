@@ -34,6 +34,20 @@ module.exports = function(sequelize, DataTypes) {
         });
         Tasks.belongsTo(models.projects);
       }
+    },
+    hooks: {
+      afterDestroy: function(task) {
+        Tasks.destroy({
+          individualHooks: true,
+          where: {
+            ancestorId: task.id
+          }
+        }).then(function (children) {
+          console.log(children);
+        }).catch(function (err) {
+          console.log(err);
+        })
+      }
     }
   });
   return Tasks;
