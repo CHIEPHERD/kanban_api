@@ -17,6 +17,7 @@ module.exports = function(connection, done) {
 
         // Update task
         Task.destroy({
+          individualHooks: true,
           where: {
             uuid: json.uuid
           }
