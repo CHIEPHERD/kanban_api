@@ -3,6 +3,7 @@ const uuidV4 = require('uuid/v4');
 let Task = models.tasks;
 let ProjectAssignment = models.project_assignments;
 let User = models.users;
+let Comment = models.comments;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
