@@ -7,7 +7,7 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       type: DataTypes.BIGINT
     },
-    text: {
+    message: {
       type: DataTypes.TEXT,
       defaultValue: ''
     },
@@ -21,6 +21,16 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         comment.belongsTo(models.users);
         comment.belongsTo(models.tasks);
+      }
+    },
+    instanceMethods: {
+      responsify: function() {
+        let result = {}
+        result.message = this.message;
+        result.uuid = this.uuid;
+        result.createdAt = this.createdAt;
+        result.updatedAt = this.updatedAt;
+        return result
       }
     }
   });
