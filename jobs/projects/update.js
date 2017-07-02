@@ -23,9 +23,7 @@ module.exports = function(connection, done) {
         }).then(function(project) {
           if(project) {
             project.update({
-              name: json.name || project.name,
-              label: json.label || project.label,
-              visibility: json.visibility || project.visibility
+              name: json.name || project.name
             }).then(function(project) {
               console.log('OK');
             }).catch(function(error) {
