@@ -20,7 +20,7 @@ module.exports = function(connection, done) {
             uuid: json.TaskUuid
           }
         }).then(function (task) {
-          if (state != undefined) {
+          if (task != undefined) {
             Comment.findAll({
               where: {
                 taskId: task.id
