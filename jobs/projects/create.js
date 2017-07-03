@@ -18,7 +18,8 @@ module.exports = function(connection, done) {
         // Create project
         Project.create({
           name: json.name,
-          label: json.label
+          label: json.label,
+          uuid: json.uuid
         }).then(function(project) {
           console.log('OK');
         }).catch(function(error) {

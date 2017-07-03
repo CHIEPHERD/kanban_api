@@ -1,11 +1,11 @@
 const models = require('../../models');
-let Task = models.tasks;
+let ProjectAssignment = models.project_assignments;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'chiepherd.task.deleted';
-    var queue = 'kanban.task.delete';
+    var ex = 'chiepherd.project_assignment.updated';
+    var queue = 'kanban.project_assignment.update';
     ch.assertExchange(ex, 'fanout', { durable: false });
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue);
@@ -15,14 +15,16 @@ module.exports = function(connection, done) {
         console.log(" [%s]: %s", queue, msg.content.toString());
         let json = JSON.parse(msg.content.toString());
 
-        // Update task
-        Task.destroy({
-          individualHooks: true,
-          where: {
-            uuid: json.uuid
-          }
-        }).then(function(task) {
-          console.log('OK');
+        // Create project_assignment
+        ProjectAssignment.find({
+          uuid: json.uuid
+        }).then(function(project_assignment) {
+          project_assignment.update({
+            projectId: json.projectId || this.projectId
+          }).then(function (assignment) {
+            console.log('OK');
+            console.log(assignment);
+          })
         }).catch(function(error) {
           console.log(error);
           console.log('NOK');
