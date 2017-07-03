@@ -1,5 +1,6 @@
 const models = require('../../models');
 let Task = models.tasks;
+let Project = models.projects;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
@@ -16,19 +17,41 @@ module.exports = function(connection, done) {
         let json = JSON.parse(msg.content.toString());
 
         // Create task
-        Task.create({
-          uuid: json.uuid,
-          title: json.title,
-          description: json.description,
-          type: json.label,
-          projectId: json.projectId,
-          ancestorId: json.ancestorId
-        }).then(function(task) {
-          console.log('OK');
-        }).catch(function(error) {
+        Project.find({
+          where: {
+            uuid: json.projectUuid
+          }
+        }).then(function (project) {
+          Task.find({
+            where: {
+              uuid: json.ancestorUuid
+            }
+          }).then(function (ancestor) {
+            if (json.ancestorUuid == null || ancestor != null) {
+              Task.create({
+                uuid: json.uuid,
+                title: json.title,
+                description: json.description,
+                type: json.label,
+                projectId: project.id,
+                ancestorId: ancestor && ancestor.id
+              }).then(function(task) {
+                console.log('OK');
+              }).catch(function(error) {
+                console.log(error);
+                console.log('NOK');
+              });
+            } else {
+              console.log('Invalid ancestor');
+            }
+          }).catch(function (error) {
+            console.log(error);
+            console.log('NOK');
+          })
+        }).catch(function (error) {
           console.log(error);
           console.log('NOK');
-        });
+        })
       }, { noAck: true });
     });
   });
