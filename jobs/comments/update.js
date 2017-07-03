@@ -1,7 +1,4 @@
 const models = require('../../models');
-let Task = models.tasks;
-let ProjectAssignment = models.project_assignments;
-let User = models.users;
 let Comment = models.comments;
 
 module.exports = function(connection, done) {
@@ -9,8 +6,8 @@ module.exports = function(connection, done) {
     console.log(err);
     var ex = 'chiepherd.main';
     ch.assertExchange(ex, 'topic');
-    ch.assertQueue('kanban.comment.create', { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, "kanban.comment.create")
+    ch.assertQueue('kanban.comment.update', { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, "kanban.comment.update")
 
       ch.consume(q.queue, function(msg) {
         // LOG
@@ -29,6 +26,7 @@ module.exports = function(connection, done) {
               ch.sendToQueue(msg.properties.replyTo,
                 new Buffer.from(JSON.stringify(comment.responsify())),
                 { correlationId: msg.properties.correlationId });
+              ch.ack(msg);
             }).catch(function (error) {
               console.log(error);
               ch.sendToQueue(msg.properties.replyTo,

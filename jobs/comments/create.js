@@ -46,6 +46,7 @@ module.exports = function(connection, done) {
                       ch.sendToQueue(msg.properties.replyTo,
                         new Buffer.from(JSON.stringify(comment.responsify())),
                         { correlationId: msg.properties.correlationId });
+                      ch.ack(msg);
                     }).catch(function (error) {
                       console.log(error);
                       ch.sendToQueue(msg.properties.replyTo,
