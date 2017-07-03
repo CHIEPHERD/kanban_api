@@ -30,6 +30,7 @@ module.exports = function(sequelize, DataTypes) {
         result.uuid = this.uuid;
         result.createdAt = this.createdAt;
         result.updatedAt = this.updatedAt;
+        result.user = this.user && this.user.responsify();
         return result
       }
     }
