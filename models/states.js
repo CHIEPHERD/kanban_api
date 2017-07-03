@@ -10,12 +10,38 @@ module.exports = function(sequelize, DataTypes) {
     uuid: {
       type: DataTypes.STRING,
       unique: true,
+    },
+    name: {
+      type: DataTypes.STRING
+    },
+    level: {
+      type: DataTypes.NTEGER.UNSIGNED
     }
   }, {
     paranoid: true,
     classMethods: {
       associate: function(models) {
         state.belongsTo(models.projects);
+      }
+    },
+    hook: {
+      afterSave: function (state) {
+        State.find({
+          where: {
+            projectId: state.projectId,
+            level: state.level,
+            id: {
+              $not: state.id
+            }
+          }
+        }).then(function (old) {
+          old.update({
+            individualHooks: true,
+            where: {
+              level: old.level + 1
+            }
+          })
+        })
       }
     }
   });

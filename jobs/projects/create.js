@@ -1,5 +1,6 @@
 const models = require('../../models');
 let Project = models.projects;
+let State = models.states;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
@@ -21,6 +22,27 @@ module.exports = function(connection, done) {
           label: json.label,
           uuid: json.uuid
         }).then(function(project) {
+          states = ['Icebox', 'Backlog', 'Ready', 'In progress', 'To test', 'Done', 'Archived']
+          for (var i = 0; i < 6; i++) {
+            State.create({
+              projectId: project.id,
+              level: i,
+              name: states[i]
+            }).then(function (state) {
+              console.log(state.responsify());
+            }).catch(function (error) {
+              console.log(error);
+            });
+          }
+          State.create({
+            projectId: project.id,
+            level: 99,
+            name: states[6]
+          }).then(function (state) {
+            console.log(state.responsify());
+          }).catch(function (error) {
+            console.log(error);
+          });
           console.log('OK');
         }).catch(function(error) {
           console.log(error);
