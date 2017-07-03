@@ -17,6 +17,7 @@ Kue.prototype.run = function () {
   createQueueFor('comment.create', jobs.comment.create)
   createQueueFor('comment.update', jobs.comment.update)
   createQueueFor('comment.delete', jobs.comment.delete)
+  createQueueFor('comment.show', jobs.comment.show)
 }
 
 function createQueueFor(resource, job) {
