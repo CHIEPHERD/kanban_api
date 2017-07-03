@@ -1,11 +1,11 @@
 const models = require('../../models');
-let Task = models.tasks;
+let State = models.states;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'chiepherd.task.deleted';
-    var queue = 'kanban.task.delete';
+    var ex = 'kanban.main';
+    var queue = 'kanban.state.delete';
     ch.assertExchange(ex, 'fanout', { durable: false });
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue);
@@ -15,17 +15,20 @@ module.exports = function(connection, done) {
         console.log(" [%s]: %s", queue, msg.content.toString());
         let json = JSON.parse(msg.content.toString());
 
-        // Update task
-        Task.destroy({
-          individualHooks: true,
-          where: {
-            uuid: json.uuid
-          }
-        }).then(function(task) {
-          console.log('OK');
+        // Create state
+        State.destroy({
+          uuid: json.uuid
+        }).then(function(state) {
+          ch.sendToQueue(msg.properties.replyTo,
+            new Buffer.from(JSON.stringify(state.responsify())),
+            { correlationId: msg.properties.correlationId });
+          ch.ack(msg);
         }).catch(function(error) {
           console.log(error);
-          console.log('NOK');
+          ch.sendToQueue(msg.properties.replyTo,
+            new Buffer(error.toString()),
+            { correlationId: msg.properties.correlationId });
+          ch.ack(msg);
         });
       }, { noAck: true });
     });

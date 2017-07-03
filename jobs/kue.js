@@ -6,11 +6,28 @@ var kue = require('kue')
 Kue.prototype.run = function () {
   createQueueFor('project.created', jobs.project.create)
   createQueueFor('project.updated', jobs.project.update)
+
   createQueueFor('user.created', jobs.user.create)
   createQueueFor('user.updated', jobs.user.update)
+
   createQueueFor('task.created', jobs.task.create)
   createQueueFor('task.updated', jobs.task.update)
   createQueueFor('task.deleted', jobs.task.delete)
+  createQueueFor('state.tasks', jobs.state.tasks)
+
+  createQueueFor('comment.create', jobs.comment.create)
+  createQueueFor('comment.update', jobs.comment.update)
+  createQueueFor('comment.delete', jobs.comment.delete)
+  createQueueFor('comment.show', jobs.comment.show)
+  createQueueFor('task.comments', jobs.task.comments)
+
+  createQueueFor('project_assignment.created', jobs.project_assignment.create)
+  createQueueFor('project_assignment.deleted', jobs.project_assignment.delete)
+  createQueueFor('project_assignment.updated', jobs.project_assignment.update)
+
+  createQueueFor('state.create', jobs.state.create)
+  createQueueFor('state.delete', jobs.state.delete)
+  createQueueFor('project.states', jobs.project.states)
 }
 
 function createQueueFor(resource, job) {

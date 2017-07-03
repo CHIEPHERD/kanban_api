@@ -35,6 +35,13 @@ module.exports = function(sequelize, DataTypes) {
           through : 'users_tasks'
         });
       }
+    },
+    instanceMethods: {
+      responsify: function() {
+        let result = {}
+        result.email = this.email
+        return result
+      }
     }
   });
   return Users;

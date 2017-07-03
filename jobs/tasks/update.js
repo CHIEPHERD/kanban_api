@@ -23,10 +23,10 @@ module.exports = function(connection, done) {
         }).then(function(task) {
           if(task) {
             task.update({
-              title: json.title,
-              description: json.description,
-              ancestorId: json.ancestorId,
-              type: json.label
+              title: json.title || task.title,
+              description: json.description || task.description,
+              ancestorId: json.ancestorId || task.ancestorId,
+              type: json.type || task.type
             }).then(function(task) {
               console.log('OK');
             }).catch(function(error) {

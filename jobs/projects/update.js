@@ -18,14 +18,12 @@ module.exports = function(connection, done) {
         // Update project
         Project.find({
           where: {
-            id: json.id
+            uuid: json.uuid
           }
         }).then(function(project) {
           if(project) {
             project.update({
-              name: json.name,
-              label: json.label,
-              visibility: json.visibility
+              name: json.name || project.name
             }).then(function(project) {
               console.log('OK');
             }).catch(function(error) {

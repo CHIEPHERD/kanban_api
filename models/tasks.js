@@ -26,13 +26,47 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         Tasks.belongsTo(models.tasks, {
-          as: 'ancestor',
-          onDelete: 'CASCADE'
+          as: 'ancestor'
         });
         Tasks.belongsToMany(models.projects, {
-          through : 'users_tasks'
+          through : 'task_assignments'
         });
         Tasks.belongsTo(models.projects);
+        Tasks.belongsTo(models.states);
+      }
+    },
+    instanceMethods: {
+      responsify: function() {
+        let result = {}
+        result.uuid = this.uuid
+        result.title = this.title
+        result.description = this.description
+        result.type = this.type
+        result.user = this.user && this.user.responsify()
+        result.ancestorUuid = this.ancestor && this.ancestor.uuid
+        result.children = []
+        return result
+      },
+      simplify: function () {
+        let result = {}
+        result.id = this.id,
+        result.ancestorId = this.ancestorId
+        result.uuid = this.uuid
+        return result
+      }
+    },
+    hooks: {
+      afterDestroy: function(task) {
+        Tasks.destroy({
+          individualHooks: true,
+          where: {
+            ancestorId: task.id
+          }
+        }).then(function (children) {
+          console.log(children);
+        }).catch(function (err) {
+          console.log(err);
+        })
       }
     }
   });

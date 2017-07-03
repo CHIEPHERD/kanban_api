@@ -7,6 +7,10 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       type: DataTypes.BIGINT
     },
+    uuid: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
     name: {
       type: DataTypes.STRING,
       unique: true,
