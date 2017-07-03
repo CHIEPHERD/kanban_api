@@ -24,6 +24,15 @@ module.exports = function(sequelize, DataTypes) {
         state.belongsTo(models.projects);
       }
     },
+    instanceMethods: {
+      responsify: function() {
+        let result = {}
+        result.names = this.names;
+        result.uuid = this.uuid;
+        result.level = this.level;
+        return result
+      }
+    },
     hook: {
       afterSave: function (state) {
         State.find({

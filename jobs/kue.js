@@ -25,6 +25,7 @@ Kue.prototype.run = function () {
 
   createQueueFor('state.create', jobs.state.create)
   createQueueFor('state.delete', jobs.state.delete)
+  createQueueFor('project.states', jobs.project.states)
 }
 
 function createQueueFor(resource, job) {
