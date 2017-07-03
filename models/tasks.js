@@ -35,6 +35,26 @@ module.exports = function(sequelize, DataTypes) {
         Tasks.belongsTo(models.states);
       }
     },
+    instanceMethods: {
+      responsify: function() {
+        let result = {}
+        result.uuid = this.uuid
+        result.title = this.title
+        result.description = this.description
+        result.type = this.type
+        result.user = this.user && this.user.responsify()
+        result.ancestorUuid = this.ancestor && this.ancestor.uuid
+        result.children = []
+        return result
+      },
+      simplify: function () {
+        let result = {}
+        result.id = this.id,
+        result.ancestorId = this.ancestorId
+        result.uuid = this.uuid
+        return result
+      }
+    },
     hooks: {
       afterDestroy: function(task) {
         Tasks.destroy({
