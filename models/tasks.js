@@ -18,6 +18,13 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       defaultValue: ''
     },
+    points: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      defaultValue: 0
+    },
+    type: {
+      type: DataTypes.ENUM('Epic', 'User story', 'Task')
+    },
     description: {
       type: DataTypes.TEXT,
       defaultValue: ''
@@ -68,7 +75,7 @@ module.exports = function(sequelize, DataTypes) {
           console.log(err);
         })
       },
-      afterUpdate({
+      afterUpdate: function (task) {
         Task.findAll({
           where: {
             ancestorId: task.id
