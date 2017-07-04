@@ -25,6 +25,9 @@ module.exports = function(sequelize, DataTypes) {
     type: {
       type: DataTypes.ENUM('Epic', 'User story', 'Task')
     },
+    priority: {
+      type: DataTypes.INTEGER.UNSIGNED,
+    },
     description: {
       type: DataTypes.TEXT,
       defaultValue: ''

@@ -34,19 +34,29 @@ module.exports = function(connection, done) {
                 name: 'Icebox'
               }).then(function (state) {
                 if (state != undefined) {
-                  Task.create({
-                    uuid: json.uuid,
-                    title: json.title,
-                    description: json.description,
-                    type: json.label,
-                    projectId: project.id,
-                    ancestorId: ancestor && ancestor.id
-                    stateId: state.id
-                  }).then(function(task) {
-                    console.log('OK');
-                  }).catch(function(error) {
-                    console.log(error);
-                    console.log('NOK');
+                  Task.max(priority, {
+                    where: {
+                      projectId: project.id,
+                      stateId: state.id
+                    }
+                  }).then(function (max) {
+                    Task.create({
+                      uuid: json.uuid,
+                      title: json.title,
+                      description: json.description,
+                      type: json.label,
+                      projectId: project.id,
+                      ancestorId: ancestor && ancestor.id
+                      stateId: state.id,
+                      priority: max.priority + 1
+                    }).then(function(task) {
+                      console.log('OK');
+                    }).catch(function(error) {
+                      console.log(error);
+                      console.log('NOK');
+                    });
+                  }).catch(function (error) {
+
                   });
                 } else {
                   console.log('Invalid state');
