@@ -16,13 +16,42 @@ module.exports = function(connection, done) {
         let json = JSON.parse(msg.content.toString());
 
         // Create project_assignment
-        ProjectAssignment.create({
-          projectId: json.projectId,
-          userId: json.userId,
-          uuid: json.uuid
-        }).then(function(project_assignment) {
-          console.log('OK');
-        }).catch(function(error) {
+        Project.find({
+          where: {
+            uuid: json.projectUuid
+          }
+        }).then(function (project) {
+          if (project != undefined) {
+            User.find({
+              where: {
+                email: json.email
+              }
+            }).then(function (user) {
+              if (user != undefined) {
+                ProjectAssignment.create({
+                  projectId: json.projectId,
+                  userId: json.userId,
+                  uuid: json.uuid
+                }).then(function(project_assignment) {
+                  console.log(project_assignment);
+                  console.log('OK');
+                }).catch(function(error) {
+                  console.log(error);
+                  console.log('NOK');
+                });
+              } else {
+                console.log('NOK');
+                console.log('Unknown user');
+              }
+            }).catch(function (error) {
+              console.log(error);
+              console.log('NOK');
+            });
+          } else {
+            console.log('NOK');
+            console.log('Unknown project');
+          }
+        }).catch(function (error) {
           console.log(error);
           console.log('NOK');
         });
