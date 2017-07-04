@@ -29,16 +29,30 @@ module.exports = function(connection, done) {
               if (state != null) {
                 task.update({
                   stateId: state.id
-                }).then(function (state) {
-
+                }).then(function (task) {
+                  ch.sendToQueue(msg.properties.replyTo,
+                    new Buffer.from(JSON.stringify(task.responsify())),
+                    { correlationId: msg.properties.correlationId });
+                  ch.ack(msg);
                 }).catch(function (error) {
-
+                  console.log(error);
+                  ch.sendToQueue(msg.properties.replyTo,
+                    new Buffer(error.toString()),
+                    { correlationId: msg.properties.correlationId });
+                  ch.ack(msg);
                 });
               } else {
-
+                ch.sendToQueue(msg.properties.replyTo,
+                  new Buffer("Unknown state."),
+                  { correlationId: msg.properties.correlationId });
+                ch.ack(msg);
               }
             }).catch(function (error) {
-
+              console.log(error);
+              ch.sendToQueue(msg.properties.replyTo,
+                new Buffer(error.toString()),
+                { correlationId: msg.properties.correlationId });
+              ch.ack(msg);
             });
           } else {
             ch.sendToQueue(msg.properties.replyTo,

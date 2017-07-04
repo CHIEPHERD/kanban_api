@@ -13,6 +13,7 @@ Kue.prototype.run = function () {
   createQueueFor('task.created', jobs.task.create)
   createQueueFor('task.updated', jobs.task.update)
   createQueueFor('task.deleted', jobs.task.delete)
+  createQueueFor('task.move', jobs.task.move)
   createQueueFor('state.tasks', jobs.state.tasks)
 
   createQueueFor('comment.create', jobs.comment.create)

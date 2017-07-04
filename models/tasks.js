@@ -67,7 +67,26 @@ module.exports = function(sequelize, DataTypes) {
         }).catch(function (err) {
           console.log(err);
         })
-      }
+      },
+      afterUpdate({
+        Task.findAll({
+          where: {
+            ancestorId: task.id
+          }
+        }).then(function (children) {
+          for (let child of children) {
+            Task.update({
+              stateId: task.stateId
+            }).then(function (child) {
+              console.log(child);
+            }).catch(function (error) {
+              console.log(error);
+            })
+          }
+        }).catch(function (error) {
+          console.log(error);
+        })
+      })
     }
   });
   return Tasks;
