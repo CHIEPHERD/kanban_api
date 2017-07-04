@@ -15,18 +15,50 @@ module.exports = function(connection, done) {
         console.log(" [%s]: %s", queue, msg.content.toString());
         let json = JSON.parse(msg.content.toString());
 
-        // Update task
-        Task.destroy({
-          individualHooks: true,
+        // Destroy task
+        Task.find({
           where: {
             uuid: json.uuid
           }
-        }).then(function(task) {
-          console.log('OK');
-        }).catch(function(error) {
+        }).then(function (task) {
+          if (task != null) {
+            Task.destroy({
+              individualHooks: true,
+              where: {
+                uuid: json.uuid
+              }
+            }).then(function(removed) {
+              Task.update({
+                priority: sequelize.literal('priority - 1')
+              }, {
+                where: {
+                  stateId: task.stateId,
+                  priority: {
+                    $gt: task.priority
+                  }
+                }
+              }).then(function (tasks) {
+                console.log(tasks);
+              }).catch(function (error) {
+                console.log(error);
+              });
+              console.log('OK');
+            }).catch(function(error) {
+              console.log(error);
+              console.log('NOK');
+            });
+          } else {
+            console.log('Unknown task');
+            console.log('NOK');
+          }
+        }).catch(function (error) {
           console.log(error);
           console.log('NOK');
         });
+
+
+
+
       }, { noAck: true });
     });
   });
