@@ -1,4 +1,5 @@
 module.exports = {
   create: require('./create'),
-  done: require('./done')
+  done: require('./done'),
+  tasks: require('./tasks')
 }
