@@ -1,7 +1,7 @@
 const models = require('../../models');
 const uuidV4 = require('uuid/v4');
 let Task = models.tasks;
-let User = models.users;
+let Project = models.projects;
 let Sprint = models.sprints;
 
 module.exports = function(connection, done) {
@@ -17,55 +17,74 @@ module.exports = function(connection, done) {
         console.log(" [%s]: %s", msg.fields.routingKey, msg.content.toString());
         let json = JSON.parse(msg.content.toString());
 
-        User.find({
+        Project.find({
           where: {
-            email: json.email
+            email: json.projectUuid
           }
-        }).then(function (user) {
-          if (user != undefined) {
-            Task.findAll({
-              uuid: {
-                $in: json.tasks
-              }
-            }).then(function (tasks) {
-              if (tasks.count() == json.tasks.length) {
-                Sprint.create({
-                  uuid: uuidV4(),
-                  week: new Date()
-                }).then(function (sprint) {
-                  Task.update({
-                    sprintId: sprint.id
-                  }, {
-                    where: {
-                      uuid: {
-                        $in: json.tasks
-                      }
-                    }
-                  }).then(function (tasks) {
-                    sprint.tasks = tasks
+        }).then(function (project) {
+          if (project != undefined) {
+            Sprint.find({
+              projectId: project.id,
+              active: true
+            }).then(function (activeSprint) {
+              if (activeSprint != undefined) {
+                ch.sendToQueue(msg.properties.replyTo,
+                  new Buffer("A sprint is still active on this project."),
+                  { correlationId: msg.properties.correlationId });
+                ch.ack(msg);
+              } else {
+                Task.findAll({
+                  uuid: {
+                    $in: json.tasks
+                  }
+                }).then(function (tasks) {
+                  if (tasks.count() == json.tasks.length) {
+                    Sprint.create({
+                      uuid: uuidV4(),
+                      week: new Date(),
+                      projectId: project.id
+                    }).then(function (sprint) {
+                      Task.update({
+                        sprintId: sprint.id
+                      }, {
+                        where: {
+                          uuid: {
+                            $in: json.tasks
+                          }
+                        }
+                      }).then(function (tasks) {
+                        sprint.tasks = tasks
+                        ch.sendToQueue(msg.properties.replyTo,
+                          new Buffer.from(JSON.stringify(sprint.responsify())),
+                          { correlationId: msg.properties.correlationId });
+                        ch.ack(msg);
+                      }).catch(function (error) {
+                        console.log(error);
+                        ch.sendToQueue(msg.properties.replyTo,
+                          new Buffer(error.toString()),
+                          { correlationId: msg.properties.correlationId });
+                        ch.ack(msg);
+                      });
+                    }).catch(function (error) {
+                      console.log(error);
+                      ch.sendToQueue(msg.properties.replyTo,
+                        new Buffer(error.toString()),
+                        { correlationId: msg.properties.correlationId });
+                      ch.ack(msg);
+                    })
+                  } else {
                     ch.sendToQueue(msg.properties.replyTo,
-                      new Buffer.from(JSON.stringify(sprint.responsify())),
+                      new Buffer("Missing tasks."),
                       { correlationId: msg.properties.correlationId });
                     ch.ack(msg);
-                  }).catch(function (error) {
-                    console.log(error);
-                    ch.sendToQueue(msg.properties.replyTo,
-                      new Buffer(error.toString()),
-                      { correlationId: msg.properties.correlationId });
-                    ch.ack(msg);
-                  });
+                  }
                 }).catch(function (error) {
                   console.log(error);
                   ch.sendToQueue(msg.properties.replyTo,
                     new Buffer(error.toString()),
                     { correlationId: msg.properties.correlationId });
                   ch.ack(msg);
-                })
-              } else {
-                ch.sendToQueue(msg.properties.replyTo,
-                  new Buffer("Missing tasks."),
-                  { correlationId: msg.properties.correlationId });
-                ch.ack(msg);
+                });
               }
             }).catch(function (error) {
               console.log(error);
@@ -76,7 +95,7 @@ module.exports = function(connection, done) {
             });
           } else {
             ch.sendToQueue(msg.properties.replyTo,
-              new Buffer("Unknown user."),
+              new Buffer("Unknown project."),
               { correlationId: msg.properties.correlationId });
             ch.ack(msg);
           }

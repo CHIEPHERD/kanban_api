@@ -13,6 +13,10 @@ module.exports = function(sequelize, DataTypes) {
     },
     week: {
       type: DataTypes.DATEONLY
+    },
+    active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   }, {
     paranoid: true,
