@@ -4,5 +4,5 @@ module.exports = {
   update: require('./update'),
   comments: require('./comments'),
   move: require('./move'),
-  changes_points: require('./changes_points')
+  change_points: require('./change_points')
 }
