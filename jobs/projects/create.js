@@ -1,4 +1,5 @@
 const models = require('../../models');
+const uuidV4 = require('uuid/v4');
 let Project = models.projects;
 let State = models.states;
 
@@ -22,9 +23,12 @@ module.exports = function(connection, done) {
           label: json.label,
           uuid: json.uuid
         }).then(function(project) {
-          states = ['Icebox', 'Backlog', 'Ready', 'In progress', 'To test', 'Done', 'Archived']
-          for (var i = 0; i < 6; i++) {
+          states = ['Archived', 'Icebox', 'Backlog', 'Ready', 'In progress', 'To test', 'Done']
+          console.log(states);
+          for (var i = 0; i < states.length; i++) {
+            console.log(states[i]);
             State.create({
+              uuid: uuidV4(),
               projectId: project.id,
               level: i,
               name: states[i]
@@ -34,15 +38,6 @@ module.exports = function(connection, done) {
               console.log(error);
             });
           }
-          State.create({
-            projectId: project.id,
-            level: 99,
-            name: states[6]
-          }).then(function (state) {
-            console.log(state.responsify());
-          }).catch(function (error) {
-            console.log(error);
-          });
           console.log('OK');
         }).catch(function(error) {
           console.log(error);

@@ -15,7 +15,6 @@ module.exports = function(connection, done) {
         console.log(" [%s]: %s", queue, msg.content.toString());
         let json = JSON.parse(msg.content.toString());
 
-        Update task
         Task.find({
           where: {
             uuid: json.uuid

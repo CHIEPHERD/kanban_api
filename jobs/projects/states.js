@@ -5,7 +5,7 @@ let State = models.states;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'kanban.main';
+    var ex = 'chiepherd.main';
     ch.assertExchange(ex, 'topic');
     ch.assertQueue('kanban.project.states', { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, "kanban.project.states")
@@ -17,7 +17,7 @@ module.exports = function(connection, done) {
 
         Project.find({
           where: {
-            uuid: json.projectId
+            uuid: json.projectUuid
           }
         }).then(function (project) {
           if (project != undefined) {

@@ -46,7 +46,7 @@ module.exports = function(connection, done) {
                       description: json.description,
                       type: json.label,
                       projectId: project.id,
-                      ancestorId: ancestor && ancestor.id
+                      ancestorId: ancestor && ancestor.id,
                       stateId: state.id,
                       priority: max.priority + 1
                     }).then(function(task) {

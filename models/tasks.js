@@ -97,8 +97,8 @@ module.exports = function(sequelize, DataTypes) {
           }
         }).catch(function (error) {
           console.log(error);
-        })
-      })
+        });
+      }
     }
   });
   return Tasks;

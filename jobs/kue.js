@@ -28,6 +28,7 @@ Kue.prototype.run = function () {
   createQueueFor('project_assignment.updated', jobs.project_assignment.update)
 
   createQueueFor('state.create', jobs.state.create)
+  createQueueFor('state.update', jobs.state.update)
   createQueueFor('state.delete', jobs.state.delete)
   createQueueFor('project.states', jobs.project.states)
 

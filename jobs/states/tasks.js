@@ -5,7 +5,7 @@ let State = models.states;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'kanban.main';
+    var ex = 'chiepherd.main';
     ch.assertExchange(ex, 'topic');
     ch.assertQueue('kanban.state.tasks', { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, "kanban.state.tasks")
