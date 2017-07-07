@@ -25,7 +25,17 @@ module.exports = function(connection, done) {
           State.find({
             uuid: json.uuid
           }).then(function (state) {
-            if (state != undefined) {
+            if (state == undefined) {
+              ch.sendToQueue(msg.properties.replyTo,
+                new Buffer("Unknown state."),
+                { correlationId: msg.properties.correlationId });
+              ch.ack(msg);
+            } else if (state.level < 4) {
+              ch.sendToQueue(msg.properties.replyTo,
+                new Buffer("Can't update this state."),
+                { correlationId: msg.properties.correlationId });
+              ch.ack(msg);
+            } else {
               state.update({
                 name: json.name || state.name
               }).then(function (state) {
@@ -40,11 +50,6 @@ module.exports = function(connection, done) {
                   { correlationId: msg.properties.correlationId });
                 ch.ack(msg);
               });
-            } else {
-              ch.sendToQueue(msg.properties.replyTo,
-                new Buffer("Unknown state."),
-                { correlationId: msg.properties.correlationId });
-              ch.ack(msg);
             }
           }).catch(function (error) {
             console.log(error);

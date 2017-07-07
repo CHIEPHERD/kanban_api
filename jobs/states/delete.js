@@ -1,13 +1,16 @@
 const models = require('../../models');
+var sequelize = require('sequelize');
 let State = models.states;
+let Task = models.tasks;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
     var ex = 'chiepherd.main';
+    var queue = 'kanban.state.delete';
     ch.assertExchange(ex, 'topic');
-    ch.assertQueue('kanban.state.delete', { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, "kanban.state.delete")
+    ch.assertQueue(queue, { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, queue)
 
       ch.consume(q.queue, function(msg) {
         // LOG
@@ -43,10 +46,21 @@ module.exports = function(connection, done) {
                 ch.ack(msg);
               } else {
                 State.destroy({
-                  uuid: json.uuid
-                }).then(function(state) {
+                  where: {
+                    uuid: json.uuid
+                  }
+                }).then(function(removed) {
+                  State.update({
+                    level: sequelize.literal('level - 1')
+                  }, {
+                    where: {
+                      level: {
+                        $gt: state.level
+                      }
+                    }
+                  })
                   ch.sendToQueue(msg.properties.replyTo,
-                    new Buffer.from(JSON.stringify(state.responsify())),
+                    new Buffer.from(JSON.stringify({ status: 'removed' })),
                     { correlationId: msg.properties.correlationId });
                   ch.ack(msg);
                 }).catch(function(error) {
@@ -72,7 +86,7 @@ module.exports = function(connection, done) {
             { correlationId: msg.properties.correlationId });
           ch.ack(msg);
         });
-      }, { noAck: true });
+      }, { noAck: false });
     });
   });
   done();

@@ -34,7 +34,7 @@ module.exports = function(connection, done) {
                 name: 'Icebox'
               }).then(function (state) {
                 if (state != undefined) {
-                  Task.max(priority, {
+                  Task.max('priority', {
                     where: {
                       projectId: project.id,
                       stateId: state.id

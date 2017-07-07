@@ -1,4 +1,5 @@
 const models = require('../../models');
+var sequelize = require('sequelize');
 let Task = models.tasks;
 let Comment = models.comments;
 
