@@ -24,8 +24,10 @@ module.exports = function(connection, done) {
             State.findAll({
               where: {
                 projectId: project.id
-              }
-            }).then(function (states) {
+              },
+              order: [
+                ['level', 'ASC']
+              ]            }).then(function (states) {
               for (var i = 0; i < states.length; i++) {
                 states[i] = states[i].responsify();
               }

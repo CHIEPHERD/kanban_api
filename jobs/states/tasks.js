@@ -25,6 +25,9 @@ module.exports = function(connection, done) {
               where: {
                 stateId: state.id
               },
+              order: [
+                ['priority', 'ASC']
+              ],
               include: [{ model: Task, as: 'ancestor' }, { model: User,  as: 'user' }]
             }).then(function (tasks) {
               var map = {}, task, roots = [];
