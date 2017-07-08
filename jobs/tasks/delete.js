@@ -1,3 +1,4 @@
+const sequelize = require('sequelize');
 const models = require('../../models');
 let Task = models.tasks;
 
@@ -55,10 +56,6 @@ module.exports = function(connection, done) {
           console.log(error);
           console.log('NOK');
         });
-
-
-
-
       }, { noAck: true });
     });
   });

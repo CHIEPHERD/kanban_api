@@ -12,7 +12,6 @@ module.exports = function(sequelize, DataTypes) {
       unique: true,
     }
   }, {
-    paranoid: true,
     classMethods: {
       associate: function(models) {
         project_assignment.belongsTo(models.users);

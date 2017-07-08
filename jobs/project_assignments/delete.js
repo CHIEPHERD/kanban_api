@@ -17,7 +17,9 @@ module.exports = function(connection, done) {
 
         // Create project_assignment
         ProjectAssignment.destroy({
-          uuid: json.uuid
+          where: {
+            uuid: json.uuid
+          }
         }).then(function(project_assignment) {
           console.log('OK');
         }).catch(function(error) {
