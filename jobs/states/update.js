@@ -16,49 +16,44 @@ module.exports = function(connection, done) {
         console.log(" [%s]: %s", msg.fields.routingKey, msg.content.toString());
         let json = JSON.parse(msg.content.toString());
 
-        if (json.level < 4) {
-          ch.sendToQueue(msg.properties.replyTo,
-            new Buffer("This state can't be updated."),
-            { correlationId: msg.properties.correlationId });
-          ch.ack(msg);
-        } else {
-          State.find({
+        State.find({
+          where: {
             uuid: json.uuid
-          }).then(function (state) {
-            if (state == undefined) {
-              ch.sendToQueue(msg.properties.replyTo,
-                new Buffer("Unknown state."),
-                { correlationId: msg.properties.correlationId });
-              ch.ack(msg);
-            } else if (state.level < 4) {
-              ch.sendToQueue(msg.properties.replyTo,
-                new Buffer("Can't update this state."),
-                { correlationId: msg.properties.correlationId });
-              ch.ack(msg);
-            } else {
-              state.update({
-                name: json.name || state.name
-              }).then(function (state) {
-                ch.sendToQueue(msg.properties.replyTo,
-                  new Buffer.from(JSON.stringify(state.responsify())),
-                  { correlationId: msg.properties.correlationId });
-                ch.ack(msg);
-              }).catch(function (error) {
-                console.log(error);
-                ch.sendToQueue(msg.properties.replyTo,
-                  new Buffer(error.toString()),
-                  { correlationId: msg.properties.correlationId });
-                ch.ack(msg);
-              });
-            }
-          }).catch(function (error) {
-            console.log(error);
+          }
+        }).then(function (state) {
+          if (state == undefined) {
             ch.sendToQueue(msg.properties.replyTo,
-              new Buffer(error.toString()),
+              new Buffer("Unknown state."),
               { correlationId: msg.properties.correlationId });
             ch.ack(msg);
-          });
-        }
+          } else if (state.level < 4) {
+            ch.sendToQueue(msg.properties.replyTo,
+              new Buffer("Can't update this state."),
+              { correlationId: msg.properties.correlationId });
+            ch.ack(msg);
+          } else {
+            state.update({
+              name: json.name || state.name
+            }).then(function (state) {
+              ch.sendToQueue(msg.properties.replyTo,
+                new Buffer.from(JSON.stringify(state.responsify())),
+                { correlationId: msg.properties.correlationId });
+              ch.ack(msg);
+            }).catch(function (error) {
+              console.log(error);
+              ch.sendToQueue(msg.properties.replyTo,
+                new Buffer(error.toString()),
+                { correlationId: msg.properties.correlationId });
+              ch.ack(msg);
+            });
+          }
+        }).catch(function (error) {
+          console.log(error);
+          ch.sendToQueue(msg.properties.replyTo,
+            new Buffer(error.toString()),
+            { correlationId: msg.properties.correlationId });
+          ch.ack(msg);
+        });
       }, { noAck: false });
     });
   });
