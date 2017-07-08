@@ -20,7 +20,7 @@ module.exports = function(connection, done) {
           }
         }).then(function (comment) {
           ch.sendToQueue(msg.properties.replyTo,
-            new Buffer.from(JSON.stringify(comment.responsify())),
+            new Buffer.from(JSON.stringify({ status: 'removed' })),
             { correlationId: msg.properties.correlationId });
           ch.ack(msg);
         }).catch(function (error) {

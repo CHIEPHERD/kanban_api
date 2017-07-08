@@ -1,5 +1,6 @@
 const models = require('../../models');
 let Task = models.tasks;
+let User = models.users;
 let Comment = models.comments;
 
 module.exports = function(connection, done) {
@@ -17,7 +18,7 @@ module.exports = function(connection, done) {
 
         Task.find({
           where: {
-            uuid: json.TaskUuid
+            uuid: json.uuid
           }
         }).then(function (task) {
           if (task != undefined) {

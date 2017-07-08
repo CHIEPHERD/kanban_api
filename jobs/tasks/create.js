@@ -40,15 +40,16 @@ module.exports = function(connection, done) {
                       stateId: state.id
                     }
                   }).then(function (max) {
+                    max = (max == NaN ? 0 : max + 1)
                     Task.create({
                       uuid: json.uuid,
                       title: json.title,
                       description: json.description,
-                      type: json.label,
+                      type: json.type,
                       projectId: project.id,
                       ancestorId: ancestor && ancestor.id,
                       stateId: state.id,
-                      priority: max.priority + 1
+                      priority: max
                     }).then(function(task) {
                       console.log('OK');
                     }).catch(function(error) {
@@ -56,7 +57,8 @@ module.exports = function(connection, done) {
                       console.log('NOK');
                     });
                   }).catch(function (error) {
-
+                    console.log(error);
+                    console.log('NOK');
                   });
                 } else {
                   console.log('Invalid state');

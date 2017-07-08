@@ -1,6 +1,7 @@
 const models = require('../../models');
 let ProjectAssignment = models.project_assignments;
 let Project = models.projects;
+let User = models.users;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
@@ -30,8 +31,8 @@ module.exports = function(connection, done) {
             }).then(function (user) {
               if (user != undefined) {
                 ProjectAssignment.create({
-                  projectId: json.projectId,
-                  userId: json.userId,
+                  projectId: project.id,
+                  userId: user.id,
                   uuid: json.uuid
                 }).then(function(project_assignment) {
                   console.log(project_assignment);
