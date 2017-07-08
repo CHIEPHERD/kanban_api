@@ -1,8 +1,8 @@
 const models = require('../../models');
 const uuidV4 = require('uuid/v4');
+const sequelize = require('sequelize');
 let Project = models.projects;
 let State = models.states;
-var sequelize = require('sequelize');
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
@@ -33,7 +33,7 @@ module.exports = function(connection, done) {
                   new Buffer("Too low level."),
                   { correlationId: msg.properties.correlationId });
                 ch.ack(msg);
-              } else if (json.level > max) {
+              } else if (json.level > max + 1) {
                 ch.sendToQueue(msg.properties.replyTo,
                   new Buffer("Too hight level."),
                   { correlationId: msg.properties.correlationId });
