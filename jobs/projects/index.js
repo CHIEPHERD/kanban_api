@@ -1,5 +1,6 @@
 module.exports = {
   create: require('./create'),
   update: require('./update'),
-  states: require('./states')
+  states: require('./states'),
+  sprints: require('./sprints')
 }
