@@ -11,8 +11,15 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       unique: true,
     },
-    week: {
+    begin: {
       type: DataTypes.DATEONLY
+    },
+    end: {
+      type: DataTypes.DATEONLY
+    },
+    active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   }, {
     paranoid: true,
@@ -20,6 +27,20 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         sprint.belongsTo(models.projects);
         sprint.hasMany(models.tasks);
+      }
+    },
+    instanceMethods: {
+      responsify: function() {
+        let result = {}
+        result.begind = this.begind;
+        result.end = this.end;
+        result.uuid = this.uuid;
+        result.tasks = this.tasks;
+        result.active = this.active;
+        for (var i = 0; i < (result.tasks && result.tasks.length) || 0; i++) {
+          result.tasks[i] = result.tasks[i].responsify();
+        }
+        return result
       }
     }
   });

@@ -1,5 +1,6 @@
 const models = require('../../models');
-let Task = models.tasks;
+const uuidV4 = require('uuid/v4');
+let Project = models.projects;
 let State = models.states;
 
 module.exports = function(connection, done) {
@@ -7,8 +8,8 @@ module.exports = function(connection, done) {
     console.log(err);
     var ex = 'chiepherd.main';
     ch.assertExchange(ex, 'topic');
-    ch.assertQueue('kanban.state.tasks', { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, "kanban.state.tasks")
+    ch.assertQueue('kanban.state.update', { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, "kanban.state.update")
 
       ch.consume(q.queue, function(msg) {
         // LOG
@@ -17,31 +18,25 @@ module.exports = function(connection, done) {
 
         State.find({
           where: {
-            uuid: json.stateUuid
+            uuid: json.uuid
           }
         }).then(function (state) {
-          if (state != undefined) {
-            Task.findAll({
-              where: {
-                stateId: state.id
-              },
-              order: [
-                ['priority', 'ASC']
-              ],
-              include: [{ model: Task, as: 'ancestor' }, { model: User,  as: 'user' }]
-            }).then(function (tasks) {
-              var map = {}, task, roots = [];
-              for (var i = 0; i < tasks.length; i++) {
-                task = tasks[i].simplify();
-                map[task.id] = i;
-                if (task.ancestorId !== null && roots[map[task.ancestorId]] != undefined) {
-                  roots[map[task.ancestorId]].children.push(tasks[i].responsify());
-                } else {
-                  roots.push(tasks[i].responsify());
-                }
-              }
+          if (state == undefined) {
+            ch.sendToQueue(msg.properties.replyTo,
+              new Buffer("Unknown state."),
+              { correlationId: msg.properties.correlationId });
+            ch.ack(msg);
+          } else if (state.level < 4) {
+            ch.sendToQueue(msg.properties.replyTo,
+              new Buffer("Can't update this state."),
+              { correlationId: msg.properties.correlationId });
+            ch.ack(msg);
+          } else {
+            state.update({
+              name: json.name || state.name
+            }).then(function (state) {
               ch.sendToQueue(msg.properties.replyTo,
-                new Buffer.from(JSON.stringify(roots)),
+                new Buffer.from(JSON.stringify(state.responsify())),
                 { correlationId: msg.properties.correlationId });
               ch.ack(msg);
             }).catch(function (error) {
@@ -51,11 +46,6 @@ module.exports = function(connection, done) {
                 { correlationId: msg.properties.correlationId });
               ch.ack(msg);
             });
-          } else {
-            ch.sendToQueue(msg.properties.replyTo,
-              new Buffer("Unknown state."),
-              { correlationId: msg.properties.correlationId });
-            ch.ack(msg);
           }
         }).catch(function (error) {
           console.log(error);

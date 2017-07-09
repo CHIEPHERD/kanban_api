@@ -15,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING
     },
     level: {
-      type: DataTypes.NTEGER.UNSIGNED
+      type: DataTypes.INTEGER.UNSIGNED
     }
   }, {
     paranoid: true,
@@ -27,7 +27,7 @@ module.exports = function(sequelize, DataTypes) {
     instanceMethods: {
       responsify: function() {
         let result = {}
-        result.names = this.names;
+        result.name = this.name;
         result.uuid = this.uuid;
         result.level = this.level;
         return result

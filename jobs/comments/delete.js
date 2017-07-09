@@ -4,7 +4,7 @@ let Comment = models.comments;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'kanban.main';
+    var ex = 'chiepherd.main';
     ch.assertExchange(ex, 'topic');
     ch.assertQueue('kanban.comment.delete', { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, "kanban.comment.delete")
@@ -20,7 +20,7 @@ module.exports = function(connection, done) {
           }
         }).then(function (comment) {
           ch.sendToQueue(msg.properties.replyTo,
-            new Buffer.from(JSON.stringify(comment.responsify())),
+            new Buffer.from(JSON.stringify({ status: 'removed' })),
             { correlationId: msg.properties.correlationId });
           ch.ack(msg);
         }).catch(function (error) {

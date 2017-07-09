@@ -1,11 +1,12 @@
 const models = require('../../models');
 let Task = models.tasks;
+let User = models.users;
 let Comment = models.comments;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'kanban.main';
+    var ex = 'chiepherd.main';
     ch.assertExchange(ex, 'topic');
     ch.assertQueue('kanban.task.comments', { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, "kanban.task.comments")
@@ -17,7 +18,7 @@ module.exports = function(connection, done) {
 
         Task.find({
           where: {
-            uuid: json.TaskUuid
+            uuid: json.uuid
           }
         }).then(function (task) {
           if (task != undefined) {

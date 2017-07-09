@@ -35,7 +35,7 @@ module.exports = function(connection, done) {
                   taskId: task.id
                 }).then(function (task) {
                   console.log('OK');
-                })catch(function (error) {
+                }).catch(function (error) {
                   console.log(error);
                   console.log('NOK');
                 });

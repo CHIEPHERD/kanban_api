@@ -14,6 +14,7 @@ Kue.prototype.run = function () {
   createQueueFor('task.updated', jobs.task.update)
   createQueueFor('task.deleted', jobs.task.delete)
   createQueueFor('task.move', jobs.task.move)
+  createQueueFor('task.change_points', jobs.task.change_points)
   createQueueFor('state.tasks', jobs.state.tasks)
 
   createQueueFor('comment.create', jobs.comment.create)
@@ -27,11 +28,18 @@ Kue.prototype.run = function () {
   createQueueFor('project_assignment.updated', jobs.project_assignment.update)
 
   createQueueFor('state.create', jobs.state.create)
+  createQueueFor('state.update', jobs.state.update)
   createQueueFor('state.delete', jobs.state.delete)
+  createQueueFor('state.move', jobs.state.move)
   createQueueFor('project.states', jobs.project.states)
 
   createQueueFor('task_assignment.created', jobs.task_assignment.create)
   createQueueFor('task_assignment.deleted', jobs.task_assignment.delete)
+
+  createQueueFor('sprint.create', jobs.sprint.create)
+  createQueueFor('sprint.done', jobs.sprint.done)
+  createQueueFor('sprint.tasks', jobs.sprint.tasks)
+  createQueueFor('sprint.show', jobs.sprint.show)
 }
 
 function createQueueFor(resource, job) {

@@ -18,6 +18,16 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       defaultValue: ''
     },
+    points: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      defaultValue: 0
+    },
+    type: {
+      type: DataTypes.ENUM('Epic', 'User story', 'Task')
+    },
+    priority: {
+      type: DataTypes.INTEGER.UNSIGNED,
+    },
     description: {
       type: DataTypes.TEXT,
       defaultValue: ''
@@ -42,6 +52,8 @@ module.exports = function(sequelize, DataTypes) {
         result.title = this.title
         result.description = this.description
         result.type = this.type
+        result.points = this.points
+        result.priority = this.priority
         result.user = this.user && this.user.responsify()
         result.ancestorUuid = this.ancestor && this.ancestor.uuid
         result.children = []
@@ -68,8 +80,8 @@ module.exports = function(sequelize, DataTypes) {
           console.log(err);
         })
       },
-      afterUpdate({
-        Task.findAll({
+      afterUpdate: function (task) {
+        Tasks.findAll({
           where: {
             ancestorId: task.id
           }
@@ -85,8 +97,8 @@ module.exports = function(sequelize, DataTypes) {
           }
         }).catch(function (error) {
           console.log(error);
-        })
-      })
+        });
+      }
     }
   });
   return Tasks;
