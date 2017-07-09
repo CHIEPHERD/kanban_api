@@ -5,9 +5,9 @@ let Task = models.tasks;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'chiepherd.task.deleted';
-    var queue = 'kanban.task.delete';
-    ch.assertExchange(ex, 'fanout', { durable: false });
+    var ex = process.env.ex;
+    var queue = 'chiepherd.task.delete.reply';
+    ch.assertExchange(ex, 'topic');
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue);
 

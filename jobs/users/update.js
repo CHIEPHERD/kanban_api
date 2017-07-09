@@ -4,9 +4,9 @@ let User = models.users;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'chiepherd.user.updated';
-    var queue = 'kanban.user.update';
-    ch.assertExchange(ex, 'fanout', { durable: false });
+    var ex = process.env.ex;
+    var queue = 'chiepherd.user.update.reply';
+    ch.assertExchange(ex, 'topic');
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue);
 

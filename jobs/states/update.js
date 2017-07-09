@@ -6,10 +6,11 @@ let State = models.states;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'chiepherd.main';
+    var ex = process.env.ex;
+    var queue = 'kanban.state.update';
     ch.assertExchange(ex, 'topic');
-    ch.assertQueue('kanban.state.update', { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, "kanban.state.update")
+    ch.assertQueue(queue, { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, queue)
 
       ch.consume(q.queue, function(msg) {
         // LOG

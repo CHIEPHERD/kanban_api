@@ -6,10 +6,11 @@ let Comment = models.comments;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'chiepherd.main';
+    var ex = process.env.ex;
+    var queue = 'kanban.task.comments';
     ch.assertExchange(ex, 'topic');
-    ch.assertQueue('kanban.task.comments', { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, "kanban.task.comments")
+    ch.assertQueue(queue, { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, queue)
 
       ch.consume(q.queue, function(msg) {
         // LOG
