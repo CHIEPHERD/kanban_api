@@ -4,10 +4,11 @@ let Task = models.tasks;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'chiepherd.main';
+    var ex = process.env.ex;
+    var queue = 'kanban.task.change_points';
     ch.assertExchange(ex, 'topic');
-    ch.assertQueue('kanban.task.change_points', { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, "kanban.task.change_points")
+    ch.assertQueue(queue, { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, queue)
 
       ch.consume(q.queue, function(msg) {
         // LOG

@@ -4,15 +4,15 @@ var amqp = require('amqplib/callback_api');
 var kue = require('kue')
 
 Kue.prototype.run = function () {
-  createQueueFor('project.created', jobs.project.create)
-  createQueueFor('project.updated', jobs.project.update)
+  createQueueFor('project.create.reply', jobs.project.create)
+  createQueueFor('project.update.reply', jobs.project.update)
 
-  createQueueFor('user.created', jobs.user.create)
-  createQueueFor('user.updated', jobs.user.update)
+  createQueueFor('user.create.reply', jobs.user.create)
+  createQueueFor('user.update.reply', jobs.user.update)
 
-  createQueueFor('task.created', jobs.task.create)
-  createQueueFor('task.updated', jobs.task.update)
-  createQueueFor('task.deleted', jobs.task.delete)
+  createQueueFor('task.create.reply', jobs.task.create)
+  createQueueFor('task.update.reply', jobs.task.update)
+  createQueueFor('task.delete.reply', jobs.task.delete)
   createQueueFor('task.move', jobs.task.move)
   createQueueFor('task.change_points', jobs.task.change_points)
   createQueueFor('state.tasks', jobs.state.tasks)
@@ -23,9 +23,9 @@ Kue.prototype.run = function () {
   createQueueFor('comment.show', jobs.comment.show)
   createQueueFor('task.comments', jobs.task.comments)
 
-  createQueueFor('project_assignment.created', jobs.project_assignment.create)
-  createQueueFor('project_assignment.deleted', jobs.project_assignment.delete)
-  createQueueFor('project_assignment.updated', jobs.project_assignment.update)
+  createQueueFor('project_assignment.create.reply', jobs.project_assignment.create)
+  createQueueFor('project_assignment.delete.reply', jobs.project_assignment.delete)
+  createQueueFor('project_assignment.update.reply', jobs.project_assignment.update)
 
   createQueueFor('state.create', jobs.state.create)
   createQueueFor('state.update', jobs.state.update)
@@ -33,8 +33,8 @@ Kue.prototype.run = function () {
   createQueueFor('state.move', jobs.state.move)
   createQueueFor('project.states', jobs.project.states)
 
-  createQueueFor('task_assignment.created', jobs.task_assignment.create)
-  createQueueFor('task_assignment.deleted', jobs.task_assignment.delete)
+  createQueueFor('task_assignment.create.reply', jobs.task_assignment.create)
+  createQueueFor('task_assignment.delete.reply', jobs.task_assignment.delete)
 
   createQueueFor('sprint.create', jobs.sprint.create)
   createQueueFor('sprint.done', jobs.sprint.done)

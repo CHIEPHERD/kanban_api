@@ -15,6 +15,8 @@ const models = require('./models');
 //   force: true
 // })
 
+process.env.ex = 'chiepherd.main'
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

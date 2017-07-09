@@ -47,3 +47,4 @@ Ip de l'api : 192.168.56.105
 - kanban.sprint.create
 - kanban.sprint.done
 - kanban.sprint.tasks
+- kanban.sprint.show
