@@ -9,6 +9,7 @@ Kue.prototype.run = function () {
 
   createQueueFor('user.create.reply', jobs.user.create)
   createQueueFor('user.update.reply', jobs.user.update)
+  createQueueFor('user.activate.reply', jobs.user.activate)
 
   createQueueFor('task.create.reply', jobs.task.create)
   createQueueFor('task.update.reply', jobs.task.update)
@@ -44,7 +45,7 @@ Kue.prototype.run = function () {
 
 function createQueueFor(resource, job) {
   let queue = kue.createQueue();
-  amqp.connect('amqp://root:root@192.168.56.1', function(err, conn) {
+  amqp.connect(process.env.amqp_ip, function(err, conn) {
     if(err) { console.log(err); return; }
     queue.process(resource, function(_job, done) {
       job(conn, done);

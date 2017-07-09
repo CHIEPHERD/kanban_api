@@ -24,6 +24,10 @@ module.exports = function(sequelize, DataTypes) {
     nickname: {
       type: DataTypes.STRING,
       defaultValue: ''
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   }, {
     classMethods: {
