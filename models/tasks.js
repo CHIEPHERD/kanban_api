@@ -81,7 +81,7 @@ module.exports = function(sequelize, DataTypes) {
         })
       },
       afterUpdate: function (task) {
-        Task.findAll({
+        Tasks.findAll({
           where: {
             ancestorId: task.id
           }

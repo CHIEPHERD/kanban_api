@@ -19,13 +19,15 @@ module.exports = function(connection, done) {
 
         Project.find({
           where: {
-            email: json.projectUuid
+            uuid: json.projectUuid
           }
         }).then(function (project) {
           if (project != undefined) {
             Sprint.find({
-              projectId: project.id,
-              active: true
+              where: {
+                projectId: project.id,
+                active: true
+              }
             }).then(function (activeSprint) {
               if (activeSprint != undefined) {
                 ch.sendToQueue(msg.properties.replyTo,
@@ -33,12 +35,15 @@ module.exports = function(connection, done) {
                   { correlationId: msg.properties.correlationId });
                 ch.ack(msg);
               } else {
+                console.log(json.tasks);
                 Task.findAll({
-                  uuid: {
-                    $in: json.tasks
+                  where: {
+                    uuid: {
+                      $in: json.tasks
+                    }
                   }
                 }).then(function (tasks) {
-                  if (tasks.count() == json.tasks.length) {
+                  if (tasks.length == json.tasks.length) {
                     Sprint.create({
                       uuid: uuidV4(),
                       week: new Date(),
@@ -52,12 +57,21 @@ module.exports = function(connection, done) {
                             $in: json.tasks
                           }
                         }
-                      }).then(function (tasks) {
-                        sprint.tasks = tasks
-                        ch.sendToQueue(msg.properties.replyTo,
-                          new Buffer.from(JSON.stringify(sprint.responsify())),
-                          { correlationId: msg.properties.correlationId });
-                        ch.ack(msg);
+                      }).then(function (updated) {
+                        sprint.reload({
+                          include: [{ as: 'tasks', model: Task }]
+                        }).then(function (sprints) {
+                          ch.sendToQueue(msg.properties.replyTo,
+                            new Buffer.from(JSON.stringify(sprint.responsify())),
+                            { correlationId: msg.properties.correlationId });
+                          ch.ack(msg);
+                        }).catch(function (error) {
+                          console.log(error);
+                          ch.sendToQueue(msg.properties.replyTo,
+                            new Buffer(error.toString()),
+                            { correlationId: msg.properties.correlationId });
+                          ch.ack(msg);
+                        })
                       }).catch(function (error) {
                         console.log(error);
                         ch.sendToQueue(msg.properties.replyTo,

@@ -14,6 +14,12 @@ module.exports = function(sequelize, DataTypes) {
     week: {
       type: DataTypes.DATEONLY
     },
+    // begin: {
+    //   type: DataTypes.DATEONLY
+    // },
+    // end: {
+    //   type: DataTypes.DATEONLY
+    // },
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
@@ -32,7 +38,7 @@ module.exports = function(sequelize, DataTypes) {
         result.week = this.week;
         result.uuid = this.uuid;
         result.tasks = this.tasks;
-        for (var i = 0; i < (result && result.length) || 0; i++) {
+        for (var i = 0; i < (result.tasks && result.tasks.length) || 0; i++) {
           result.tasks[i] = result.tasks[i].responsify();
         }
         return result

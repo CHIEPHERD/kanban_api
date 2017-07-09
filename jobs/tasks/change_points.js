@@ -4,15 +4,14 @@ let Task = models.tasks;
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
-    var ex = 'kanban.task.changes_points';
-    var queue = 'kanban.task.changes_points';
-    ch.assertExchange(ex, 'fanout', { durable: false });
-    ch.assertQueue(queue, { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, queue);
+    var ex = 'chiepherd.main';
+    ch.assertExchange(ex, 'topic');
+    ch.assertQueue('kanban.task.change_points', { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, "kanban.task.change_points")
 
       ch.consume(q.queue, function(msg) {
         // LOG
-        console.log(" [%s]: %s", queue, msg.content.toString());
+        console.log(" [%s]: %s", msg.fields.routingKey, msg.content.toString());
         let json = JSON.parse(msg.content.toString());
 
         Task.find({
@@ -48,7 +47,7 @@ module.exports = function(connection, done) {
             { correlationId: msg.properties.correlationId });
           ch.ack(msg);
         });
-      }, { noAck: true });
+      }, { noAck: false });
     });
   });
   done();
