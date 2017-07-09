@@ -40,7 +40,7 @@ module.exports = function(connection, done) {
                       stateId: state.id
                     }
                   }).then(function (max) {
-                    max = (max == NaN ? 0 : max + 1)
+                    max = (isNaN(max) ? 0 : max + 1)
                     Task.create({
                       uuid: json.uuid,
                       title: json.title,
