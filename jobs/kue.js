@@ -41,6 +41,7 @@ Kue.prototype.run = function () {
   createQueueFor('sprint.done', jobs.sprint.done)
   createQueueFor('sprint.tasks', jobs.sprint.tasks)
   createQueueFor('sprint.show', jobs.sprint.show)
+  createQueueFor('project.sprints', jobs.project.sprints)
 }
 
 function createQueueFor(resource, job) {
