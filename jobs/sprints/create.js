@@ -17,109 +17,117 @@ module.exports = function(connection, done) {
         console.log(" [%s]: %s", msg.fields.routingKey, msg.content.toString());
         let json = JSON.parse(msg.content.toString());
 
-        Project.find({
-          where: {
-            uuid: json.projectUuid
-          }
-        }).then(function (project) {
-          if (project != undefined) {
-            Sprint.find({
-              where: {
-                projectId: project.id,
-                active: true
-              }
-            }).then(function (activeSprint) {
-              if (activeSprint != undefined) {
-                ch.sendToQueue(msg.properties.replyTo,
-                  new Buffer("A sprint is still active on this project."),
-                  { correlationId: msg.properties.correlationId });
-                ch.ack(msg);
-              } else {
-                console.log(json.tasks);
-                Task.findAll({
-                  where: {
-                    uuid: {
-                      $in: json.tasks
+        if (Date.parse(json.end) > new Date()) {
+          Project.find({
+            where: {
+              uuid: json.projectUuid
+            }
+          }).then(function (project) {
+            if (project != undefined) {
+              Sprint.find({
+                where: {
+                  projectId: project.id,
+                  active: true
+                }
+              }).then(function (activeSprint) {
+                if (activeSprint != undefined) {
+                  ch.sendToQueue(msg.properties.replyTo,
+                    new Buffer("A sprint is still active on this project."),
+                    { correlationId: msg.properties.correlationId });
+                  ch.ack(msg);
+                } else {
+                  console.log(json.tasks);
+                  Task.findAll({
+                    where: {
+                      uuid: {
+                        $in: json.tasks
+                      }
                     }
-                  }
-                }).then(function (tasks) {
-                  if (tasks.length == json.tasks.length) {
-                    Sprint.create({
-                      uuid: uuidV4(),
-                      week: new Date(),
-                      projectId: project.id
-                    }).then(function (sprint) {
-                      Task.update({
-                        sprintId: sprint.id
-                      }, {
-                        where: {
-                          uuid: {
-                            $in: json.tasks
+                  }).then(function (tasks) {
+                    if (tasks.length == json.tasks.length) {
+                      Sprint.create({
+                        uuid: uuidV4(),
+                        begin: new Date(),
+                        end: Date.parse(json.end),
+                        projectId: project.id
+                      }).then(function (sprint) {
+                        Task.update({
+                          sprintId: sprint.id
+                        }, {
+                          where: {
+                            uuid: {
+                              $in: json.tasks
+                            }
                           }
-                        }
-                      }).then(function (updated) {
-                        sprint.reload({
-                          include: [{ as: 'tasks', model: Task }]
-                        }).then(function (sprints) {
-                          ch.sendToQueue(msg.properties.replyTo,
-                            new Buffer.from(JSON.stringify(sprint.responsify())),
-                            { correlationId: msg.properties.correlationId });
-                          ch.ack(msg);
+                        }).then(function (updated) {
+                          sprint.reload({
+                            include: [{ as: 'tasks', model: Task }]
+                          }).then(function (sprints) {
+                            ch.sendToQueue(msg.properties.replyTo,
+                              new Buffer.from(JSON.stringify(sprint.responsify())),
+                              { correlationId: msg.properties.correlationId });
+                            ch.ack(msg);
+                          }).catch(function (error) {
+                            console.log(error);
+                            ch.sendToQueue(msg.properties.replyTo,
+                              new Buffer(error.toString()),
+                              { correlationId: msg.properties.correlationId });
+                            ch.ack(msg);
+                          })
                         }).catch(function (error) {
                           console.log(error);
                           ch.sendToQueue(msg.properties.replyTo,
                             new Buffer(error.toString()),
                             { correlationId: msg.properties.correlationId });
                           ch.ack(msg);
-                        })
+                        });
                       }).catch(function (error) {
                         console.log(error);
                         ch.sendToQueue(msg.properties.replyTo,
                           new Buffer(error.toString()),
                           { correlationId: msg.properties.correlationId });
                         ch.ack(msg);
-                      });
-                    }).catch(function (error) {
-                      console.log(error);
+                      })
+                    } else {
                       ch.sendToQueue(msg.properties.replyTo,
-                        new Buffer(error.toString()),
+                        new Buffer("Missing tasks."),
                         { correlationId: msg.properties.correlationId });
                       ch.ack(msg);
-                    })
-                  } else {
+                    }
+                  }).catch(function (error) {
+                    console.log(error);
                     ch.sendToQueue(msg.properties.replyTo,
-                      new Buffer("Missing tasks."),
+                      new Buffer(error.toString()),
                       { correlationId: msg.properties.correlationId });
                     ch.ack(msg);
-                  }
-                }).catch(function (error) {
-                  console.log(error);
-                  ch.sendToQueue(msg.properties.replyTo,
-                    new Buffer(error.toString()),
-                    { correlationId: msg.properties.correlationId });
-                  ch.ack(msg);
-                });
-              }
-            }).catch(function (error) {
-              console.log(error);
+                  });
+                }
+              }).catch(function (error) {
+                console.log(error);
+                ch.sendToQueue(msg.properties.replyTo,
+                  new Buffer(error.toString()),
+                  { correlationId: msg.properties.correlationId });
+                ch.ack(msg);
+              });
+            } else {
               ch.sendToQueue(msg.properties.replyTo,
-                new Buffer(error.toString()),
+                new Buffer("Unknown project."),
                 { correlationId: msg.properties.correlationId });
               ch.ack(msg);
-            });
-          } else {
+            }
+          }).catch(function (error) {
+            console.log(error);
             ch.sendToQueue(msg.properties.replyTo,
-              new Buffer("Unknown project."),
+              new Buffer(error.toString()),
               { correlationId: msg.properties.correlationId });
             ch.ack(msg);
-          }
-        }).catch(function (error) {
-          console.log(error);
+          });
+        } else {
           ch.sendToQueue(msg.properties.replyTo,
-            new Buffer(error.toString()),
+            new Buffer("Invalid end date."),
             { correlationId: msg.properties.correlationId });
           ch.ack(msg);
-        });
+        }
       }, { noAck: false });
     });
   });
