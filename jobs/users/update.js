@@ -6,6 +6,7 @@ module.exports = function(connection, done) {
     console.log(err);
     var ex = process.env.ex;
     var queue = 'chiepherd.user.update.reply';
+    
     ch.assertExchange(ex, 'topic');
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue);

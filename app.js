@@ -16,6 +16,7 @@ const models = require('./models');
 // })
 
 process.env.ex = 'chiepherd.main'
+process.env.amqp_ip = 'amqp://root:root@192.168.56.200';
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -8,6 +8,7 @@ module.exports = function(connection, done) {
     console.log(err);
     var ex = process.env.ex;
     var queue = 'chiepherd.project_assignment.create.reply';
+    
     ch.assertExchange(ex, 'topic');
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue);
@@ -26,7 +27,8 @@ module.exports = function(connection, done) {
           if (project != undefined) {
             User.find({
               where: {
-                email: json.email
+                email: json.email,
+                isActive: true
               }
             }).then(function (user) {
               if (user != undefined) {

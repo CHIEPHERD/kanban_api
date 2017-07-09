@@ -6,9 +6,11 @@ module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
     var ex = process.env.ex;
+    var queue = 'kanban.project.states';
+
     ch.assertExchange(ex, 'topic');
-    ch.assertQueue('kanban.project.states', { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, "kanban.project.states")
+    ch.assertQueue(queue, { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, queue)
 
       ch.consume(q.queue, function(msg) {
         // LOG

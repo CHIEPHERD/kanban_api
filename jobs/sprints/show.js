@@ -8,9 +8,11 @@ module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
     var ex = process.env.ex;
+    var queue = 'kanban.sprint.show';
+
     ch.assertExchange(ex, 'topic');
-    ch.assertQueue('kanban.sprint.show', { exclusive: false }, function(err, q) {
-      ch.bindQueue(q.queue, ex, "kanban.sprint.show")
+    ch.assertQueue(queue, { exclusive: false }, function(err, q) {
+      ch.bindQueue(q.queue, ex, queue)
 
       ch.consume(q.queue, function(msg) {
         // LOG
