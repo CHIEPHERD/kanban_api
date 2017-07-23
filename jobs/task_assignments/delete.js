@@ -8,7 +8,7 @@ module.exports = function(connection, done) {
     console.log(err);
     var ex = process.env.ex;
     var queue = 'chiepherd.task_assignment.delete.reply';
-    
+
     ch.assertExchange(ex, 'topic');
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue);
@@ -32,8 +32,10 @@ module.exports = function(connection, done) {
             }).then(function (user) {
               if (user != undefined) {
                 TaskAssignment.destroy({
-                  userId: user.id,
-                  taskId: task.id
+                  where: {
+                    userId: user.id,
+                    taskId: task.id
+                  }
                 }).then(function (task) {
                   console.log('OK');
                 }).catch(function (error) {

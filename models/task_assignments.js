@@ -9,10 +9,9 @@ module.exports = function(sequelize, DataTypes) {
     },
     uuid: {
       type: DataTypes.STRING,
-      unique: true,
+      unique: true
     }
   }, {
-    paranoid: true,
     classMethods: {
       associate: function(models) {
         task_assignment.belongsTo(models.users);

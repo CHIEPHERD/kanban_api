@@ -8,7 +8,7 @@ module.exports = function(connection, done) {
     console.log(err);
     var ex = process.env.ex;
     var queue = 'chiepherd.task.create.reply';
-    
+
     ch.assertExchange(ex, 'topic');
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue);
@@ -31,8 +31,10 @@ module.exports = function(connection, done) {
           }).then(function (ancestor) {
             if (json.ancestorUuid == null || ancestor != null) {
               State.find({
-                projectId: project.id,
-                name: 'Icebox'
+                where: {
+                  projectId: project.id,
+                  name: 'Icebox'
+                }
               }).then(function (state) {
                 if (state != undefined) {
                   Task.max('priority', {

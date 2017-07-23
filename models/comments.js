@@ -16,7 +16,6 @@ module.exports = function(sequelize, DataTypes) {
       unique: true,
     }
   }, {
-    paranoid: true,
     classMethods: {
       associate: function(models) {
         comment.belongsTo(models.users);
