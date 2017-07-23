@@ -38,9 +38,6 @@ module.exports = function(sequelize, DataTypes) {
         Tasks.belongsTo(models.tasks, {
           as: 'ancestor'
         });
-        Tasks.belongsToMany(models.projects, {
-          through : 'task_assignments'
-        });
         Tasks.belongsTo(models.projects);
         Tasks.belongsTo(models.states);
       }
@@ -68,18 +65,6 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     hooks: {
-      afterDestroy: function(task) {
-        Tasks.destroy({
-          individualHooks: true,
-          where: {
-            ancestorId: task.id
-          }
-        }).then(function (children) {
-          console.log(children);
-        }).catch(function (err) {
-          console.log(err);
-        })
-      },
       afterUpdate: function (task) {
         Tasks.findAll({
           where: {
@@ -87,7 +72,7 @@ module.exports = function(sequelize, DataTypes) {
           }
         }).then(function (children) {
           for (let child of children) {
-            Task.update({
+            child.update({
               stateId: task.stateId
             }).then(function (child) {
               console.log(child);

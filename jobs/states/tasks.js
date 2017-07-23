@@ -1,13 +1,14 @@
 const models = require('../../models');
 let Task = models.tasks;
 let State = models.states;
+let User = models.users;
 
 module.exports = function(connection, done) {
   connection.createChannel(function(err, ch) {
     console.log(err);
     var ex = process.env.ex;
     var queue = 'kanban.state.tasks';
-    
+
     ch.assertExchange(ex, 'topic');
     ch.assertQueue(queue, { exclusive: false }, function(err, q) {
       ch.bindQueue(q.queue, ex, queue)
@@ -30,7 +31,7 @@ module.exports = function(connection, done) {
               order: [
                 ['priority', 'ASC']
               ],
-              include: [{ model: Task, as: 'ancestor' }, { model: User,  as: 'user' }]
+              include: [{ model: Task, as: 'ancestor' }]
             }).then(function (tasks) {
               var map = {}, task, roots = [];
               for (var i = 0; i < tasks.length; i++) {
